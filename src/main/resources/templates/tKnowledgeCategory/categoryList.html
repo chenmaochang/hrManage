@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>知识库</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+	<div style="padding-bottom: 20px">
+		<ul class="layui-nav" lay-filter="" style="background-color: #3d3d3d">
+			<li class="layui-nav-item"><a href="">首页</a></li>
+			<li class="layui-nav-item layui-this"><a href="">列表</a></li>
+		</ul>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">分类名称</label>
+		<div class="layui-input-inline">
+			<input id="categoryName" placeholder="请输入分类名称" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">创建时间</label>
+		<div class="layui-input-inline">
+			<input id="createStart" placeholder="开始时间" class="layui-input">
+		</div>
+		<div class="layui-input-inline">
+			<input id="createEnd" placeholder="结束时间" class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<div class="layui-input-inline">
+		<a class="layui-btn layui-btn-normal" onclick="searchGrid()"> 搜索 </a>
+		</div>
+	</div>
+<a class="layui-btn layui-btn-primary"  onclick="add({})">新增分类</a>
+	<div style="height: 80%">
+	<table class="layui-hidden" id="treeTable" lay-filter="treeTable" ></table>
+	</div>
+		<script th:inline="javascript">
+		var editObj=null,ptable=null,treeGrid=null,tableId='treeTable',layer=null;
+	    layui.config({
+	        base: _ctx+'/layui/extend/'
+	    }).extend({
+	        treeGrid:'treeGrid'
+	    }).use(['jquery','treeGrid','layer'], function(){
+	        var $=layui.jquery;
+	        treeGrid = layui.treeGrid;//很重要
+	        layer=layui.layer;
+	        ptable=treeGrid.render({
+	            id:tableId
+	            ,elem: '#'+tableId
+	            ,idField:'id'
+	            ,url:_ctx+'/tKnowledgeCategory/listData'
+	            ,cellMinWidth: 100
+	            ,treeId:'id'//树形id字段名称
+	            ,treeUpId:'pid'//树形父id字段名称
+	            ,treeShowName:'categoryName'//以树形式显示的字段
+	            ,cols: [[
+	                {field:'categoryName',width:'20%', title: '分类名称'}
+	                ,{field:'categoryLevel',width:'20%', title: '分类级别'}
+	                ,{field:'contentNum',width:'20%', title: '内容数量',templet:function(d){
+	                	if(d.contentNum>0){return d.contentNum}else{return "暂无";}
+	                }}
+	                ,{field:'createTime',width:'20%', title: '创建时间' ,templet:function(d){
+	                	return dateFormat(d.createTime, 'Y-m-d H:i:s');
+	                }}
+	                ,{width:'20%',title: '操作', align:'center'/*toolbar: '#barDemo'*/
+	                    ,templet: function(d){
+	                    var renameBtn='<a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="edit">重命名</a>';
+	                    var addBtn=d.categoryLevel<=2?'<a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="add">添加子类</a>':"";
+	                    var delBtn='<a class="layui-btn layui-btn-radius layui-btn-danger layui-btn-xs" lay-event="del">删除</a>';
+	                    return renameBtn+addBtn+delBtn;
+	                }
+	                }
+	            ]]
+	            ,page:false
+	        });
+
+	        treeGrid.on('tool('+tableId+')',function (obj) {
+	            if(obj.event === 'del'){//删除行
+	                del(obj);
+	            }else if(obj.event==="add"){//添加行
+	                add(obj.data);
+	            }else if(obj.event==="edit"){//编辑行
+	            	edit(obj.data);
+	            }
+	        });
+	        
+	    });
+	    
+	    layui.use('laydate', function(){
+			  var laydate = layui.laydate;
+			  laydate.render({ 
+				  elem: '#createStart'
+				  ,type: 'datetime'
+				});
+			  laydate.render({ 
+				  elem: '#createEnd'
+				  ,type: 'datetime'
+				});
+			});
+	    
+	    
+
+	    function del(obj) {
+	        layer.confirm("你确定删除数据吗？如果存在下级节点则一并删除，此操作不能撤销！", {icon: 3, title:'提示'},
+	            function(index){//确定回调
+	                $.ajax({
+	                	type:'post',
+	                	url:_ctx+'/tKnowledgeCategory/delete',
+	                	data:{'categoryId':obj.data.id},
+	                	success:function(){
+	                		treeGrid.reload('treeTable',{});
+	                	}
+	                });
+	                layer.close(index);
+	            },function (index) {//取消回调
+	               layer.close(index);
+	            }
+	        );
+	    }
+	    
+	    function edit(pObj){
+	    	layui.use('layer', function(){
+		    	  var layer = layui.layer;
+		    	  var index = layer.open({
+			    	  type: 2,
+			    	  title: "编辑",
+			    	  content: _ctx+'/tKnowledgeCategory/categoryEdit?categoryId='+pObj.id,
+			    	  area: ['600px', '300px'],
+			    	  maxmin: true,
+			    	  end:function(){
+			    		  //doing sth
+			    	  }
+			    	});
+		    	  //layer.full(index);
+		    	});    
+	    }
+
+
+	    var i=1000;
+	    //添加
+	    function add(pObj) {
+	    	var url=pObj.id?_ctx+'/tKnowledgeCategory/categoryCreate?categoryId='+pObj.id:_ctx+'/tKnowledgeCategory/categoryCreate?categoryId=""';
+	        layui.use('layer', function(){
+		    	  var layer = layui.layer;
+		    	  var index = layer.open({
+			    	  type: 2,
+			    	  title: "创建",
+			    	  content: url,
+			    	  area: ['600px', '300px'],
+			    	  maxmin: true,
+			    	  end:function(){
+			    		  //doing sth
+			    	  }
+			    	});
+		    	  //layer.full(index);
+		    	});
+	    }
+
+	    //搜寻方法
+	    function searchGrid(){
+	    	treeGrid.reload('treeTable',{});
+	    	setTimeout("renderColor()",200);
+	    }
+	    
+	    //查找并染色
+	    function renderColor(){
+	    	if($('#createStart').val()||$('#createEnd').val()||$('#categoryName').val()){
+	    		var searchCategoryName=$('#categoryName').val();
+				var createStart=convertDateFromString($('#createStart').val()?$('#createStart').val():"1970-01-01 00:00:00");
+				var createEnd=convertDateFromString($('#createEnd').val()?$('#createEnd').val():"2100-01-01 00:00:00");
+				var list=$(".layui-table-main").find("table").find("tbody").children();
+				for(var i=0;i<list.length;i++){
+					var tdList=$(list[i]).children();
+					var renderName=false;
+					var renderCreateTime=false;
+					for(var j=0;j<tdList.length;j++){
+						var createTime=convertDateFromString($(tdList[j]).find("[class$='createTime']").find("p").text());
+						var categoryName=$(tdList[j]).find("[class$='categoryName']").find("p").text();
+						var conditionCategoryName=categoryName.indexOf(searchCategoryName)!=-1;
+						var conditionCreateTime=createEnd>createTime&&createStart<createTime;
+						if(conditionCategoryName){
+							renderName=true;
+						}
+						if(conditionCreateTime){
+							renderCreateTime=true;
+						}
+					}
+					if(renderName&&renderCreateTime){
+						$(list[i]).css("background-color","#8968CD").css("color","white");
+					}
+				}	
+	    	}
+	    }
+	    
+	    
+	    
+		</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>知识库</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body style="margin-top: 10px;">
+	<!-- <div style="padding-bottom: 20px">
+		<ul class="layui-nav" lay-filter="" style="background-color: #3d3d3d">
+			<li class="layui-nav-item"><a href="">首页</a></li>
+			<li class="layui-nav-item layui-this"><a href="">列表</a></li>
+		</ul>
+	</div> -->
+	<div style="display: inline-block; ">
+		<label class="layui-form-label">商品名称</label>
+		<div class="layui-input-inline" style="width: 150px;">
+			<input id="goodsName" placeholder="请输入商品名称" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">商品状态</label>
+		<div class="layui-input-inline">
+			<select class="layui-input" id="pendStatus" style="width: 100px;">
+				<option value="">请选择</option>
+				<option value="1">出售中</option>
+				<option value="0">待上架</option>
+			</select>
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">商品状类目</label>
+		<div class="layui-input-inline">
+			 <select id="belongCategory"  class="layui-input" >
+				<option value="" > 请选择  </option>
+				<option value="社保公积金" >社保公积金</option>
+				<option value="医疗健康" >医疗健康</option>
+				<option value="人脸识别" >人脸识别</option>
+				<option value="OCR识别" >OCR识别</option>
+				<option value="金融征信" >金融征信</option>
+				<option value="公共交通" >公共交通</option>
+				<option value="居住信息" >居住信息</option>
+				<option value="礼品卡兑换" >礼品卡兑换</option>
+				<option value="生活服务" >生活服务</option>
+	</select>
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<div class="layui-input-inline">
+			<a class="layui-btn layui-btn-normal" onclick="searchGrid()"> 搜索
+			</a>
+		</div>
+	</div>
+	<a class="layui-btn layui-btn-primary"  onclick="add({})">新增</a>
+	<a class="layui-btn "  onclick="batchOperate(1)">批量上架</a>
+	<a class="layui-btn "  onclick="batchOperate(2)">批量下架</a>
+	<a class="layui-btn layui-btn-danger"  onclick="batchOperate(3)">批量删除</a>
+	<div style="height: 80%">
+	<table class="layui-hide" id="idTest" lay-filter="idTest"></table>
+	</div>
+	<script type="text/html" id="barDemo">
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="get">查看</a>
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="edit">编辑</a>
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="del">删除</a>
+{{#  if(d.pendStatus==1){ }}
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="pendOff">下架</a>
+  {{#  } else { }}
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="pendOn">上架</a>
+  {{#  } }}
+	</script>
+		<script th:inline="javascript">
+		layui.use('element', function(){
+			  var element = layui.element;
+			});
+			var table;
+			layui.use('table', function() {
+				table = layui.table;
+				table.render({
+					elem : '#idTest',
+					height : 'full',
+					where:{},
+					url : _ctx+'/goods/listData',
+					id : 'idTest',
+					method : "post",
+					loading: true,
+					limits:[5,10],
+					cols : [ 
+					         [
+					{type:'checkbox'} ,
+					{field : 'goodsName',width : "20%",title : '标题' },
+					{field : 'belongCategory',width : "10%",title : '类目' },
+					{field : 'goodsPrice',width : "10%",title : '价格',templet:function(d){return "资讯客服";} },
+					{field : 'pendStatus',width : "10%",title : '状态',templet:function(d){if(d.pendStatus==0){return "待上架";}else{return "出售中";}} },
+					{field : 'updateTime',width : "20%",title : '最后编辑时间' ,templet:function(d){return dateFormat(d.createTime, 'Y-m-d H:i:s')}},
+					{fixed: 'right',title:'操作栏',width : "300px;", align:'center', toolbar: '#barDemo',style:'background-color: #C4C4C4; color: #fff;'}
+					] 
+					         ],
+					page : true
+				});
+				  //监听工具条
+				  table.on('tool(idTest)', function(obj){
+				    var data = obj.data;
+				    if(obj.event === 'get'){
+				    	get(data);//明细
+				    }else if(obj.event=== 'edit'){
+				    	edit(data);//编辑
+				    }else if(obj.event==='del'){
+				    	del(data);//删除
+				    }else if(obj.event==='pendOn'){
+				    	pend(data,1);//删除
+				    }else if(obj.event==='pendOff'){
+				    	pend(data,0);//删除
+				    }
+				  });
+				  
+			});
+	    
+	    
+			function get(obj){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "查看",
+				    	  content: _ctx+'/goods/get?id='+obj.id,
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+			
+			//添加
+		    function add() {
+		        layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "创建",
+				    	  content: _ctx+'/goods/create?id=',
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+		    }
+			
+		    function del(obj) {
+		        layer.confirm("你确定删除数据吗？", {icon: 3, title:'提示'},
+		            function(index){//确定回调
+		                $.ajax({
+		                	type:'post',
+		                	url:_ctx+'/goods/delete',
+		                	data:{'id':obj.id},
+		                	success:function(){
+		                		$(".layui-laypage-btn")[0].click();
+		                	}
+		                });
+		                layer.close(index);
+		            },function (index) {//取消回调
+		               layer.close(index);
+		            }
+		        );
+		    }
+		    
+		    function pend(obj,status) {
+		        layer.confirm("确定进行此操作吗？", {icon: 3, title:'提示'},
+		            function(index){//确定回调
+		                $.ajax({
+		                	type:'post',
+		                	url:_ctx+'/goods/pend',
+		                	data:{'id':obj.id,'pendStatus':status},
+		                	success:function(){
+		                		$(".layui-laypage-btn")[0].click();
+		                	}
+		                });
+		                layer.close(index);
+		            },function (index) {//取消回调
+		               layer.close(index);
+		            }
+		        );
+		    }
+			
+		  //编辑
+		    function edit(obj) {
+		        layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "创建",
+				    	  content: _ctx+'/goods/create?id='+obj.id,
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+		    }
+			
+ 			
+			function searchGrid() {
+				var searchData={};
+				 	searchData.goodsName=$('#goodsName').val();
+				 	searchData.pendStatus=$('#pendStatus').val();
+				 	searchData.belongCategory=$("#belongCategory").val();
+				table.reload('idTest', {
+					where : searchData,
+					page : {
+						curr : 1//重新从第 1 页开始
+					}
+				});
+			}
+			
+		      
+		      function batchOperate(operate){
+		    	  layer.confirm("确定进行批量操作吗？", {icon: 3, title:'提示'},
+				            function(index){//确定回调
+		    		  var checkStatus = table.checkStatus('idTest');
+				      var data = checkStatus.data;
+				      var ids = data.map(function(v){return v.id;});
+				                $.ajax({
+				                	type:'post',
+				                	url:_ctx+'/goods/batchOperate',
+				                	data:{'ids':JSON.stringify(ids),'operate':operate},
+				                	success:function(){
+				                		$(".layui-laypage-btn")[0].click();
+				                	}
+				                });
+				                layer.close(index);
+				            },function (index) {//取消回调
+				               layer.close(index);
+				            }
+				        );
+		      }
+		</script>
+</body>
+</html>

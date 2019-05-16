@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>知识库</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+  <form class="layui-form" action="/api/save">
+  <div class="layui-form-item">
+    <label class="layui-form-label">分类名称</label>
+    <div class="layui-input-block" style="width: 300px;">
+    <input name="pid" type="hidden" th:value="${tKnowledgeCategory.id}">
+    <input name="categoryLevel" type="hidden" th:value="${tKnowledgeCategory.categoryLevel+1}">
+    <input name="path" type="hidden" th:value="${tKnowledgeCategory.path}">
+      <input type="text" name="categoryName" lay-verify="required" autocomplete="off" placeholder="请输入名称" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">分类code</label>
+    <div class="layui-input-block" style="width: 300px;">
+      <input type="text" name="categoryCode" lay-verify="required" autocomplete="off" placeholder="请输入标code" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-input-block" style="width: 300px;">
+      <button class="layui-btn" lay-submit="" lay-filter="submitForm">确认</button>
+    </div>
+  </div>
+  
+</form>
+ 
+		<script th:inline="javascript">
+		layui.use(['form', 'layedit', 'laydate'], function(){
+			  var form = layui.form
+			  ,layer = layui.layer
+			  ,layedit = layui.layedit;
+			  
+			  form.on('submit(submitForm)', function(data){
+				  console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+				  console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+				  console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+				  $.ajax({
+					  url:_ctx+'/tKnowledgeCategory/save',
+					  type:'post',
+					  data:data.field,
+					  success:function(result){
+						  var index = parent.layer.getFrameIndex(window.name);
+						  parent.treeGrid.query('treeTable',null);
+						  parent.layer.close(index);
+					  }
+				  });
+				  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+				});	  
+		});
+		
+		
+	    
+		
+		</script>
+</body>
+</html>

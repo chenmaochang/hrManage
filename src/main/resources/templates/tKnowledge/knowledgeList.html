@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>知识库</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+	<div style="padding-bottom: 20px">
+		<ul class="layui-nav" lay-filter="" style="background-color: #3d3d3d">
+			<li class="layui-nav-item"><a href="">首页</a></li>
+			<li class="layui-nav-item layui-this"><a href="">列表</a></li>
+		</ul>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">标题</label>
+		<div class="layui-input-inline">
+			<input id="title" placeholder="请输入标题" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">创建时间</label>
+		<div class="layui-input-inline">
+			<input id="createStart" placeholder="开始时间" class="layui-input">
+		</div>
+		<div class="layui-input-inline">
+			<input id="createEnd" placeholder="结束时间" class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">分类</label>
+		<div class="layui-input-inline">
+			<input type="text" id="category" placeholder="点选分类"  readonly onclick="selectCategory()" class="layui-input">
+		</div>
+	</div>
+	
+	
+	<div style="display: inline-block;">
+		<div class="layui-input-inline">
+		<a class="layui-btn layui-btn-normal" onclick="searchGrid()"> 搜索 </a>
+		</div>
+	</div>
+<a class="layui-btn layui-btn-primary"  onclick="add({})">新增</a>
+	<div style="height: 80%">
+	<table class="layui-hide" id="idTest" lay-filter="idTest"></table>
+	</div>
+	<script type="text/html" id="barDemo">
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="get">查看</a>
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="edit">编辑</a>
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="del">删除</a>
+	</script>
+		<script th:inline="javascript">
+		var category=null;
+		var categories=[[${tKnowledgeCategories}]];
+		
+		layui.use('element', function(){
+			  var element = layui.element;
+			});
+			var table;
+			layui.use('table', function() {
+				table = layui.table;
+				table.render({
+					elem : '#idTest',
+					height : 'full',
+					where:{},
+					url : _ctx+'/tKnowledge/listData',
+					id : 'idTest',
+					method : "post",
+					loading: true,
+					limits:[5,10],
+					cols : [ 
+					         [
+					{field : 'id',width : "20%",title : 'ID' },
+					{field : 'title',width : "10%",title : '标题' },
+					{field : 'categoryId',width : "30%",title : '分类' ,templet:function(d){return renderCategoryName(d.categoryId);}},
+					{field : 'createType',width : "10%",title : '生成方式 ' ,templet:function(d){if(d.createType==1){return "系统生成";}else {return "手动添加";}}},
+					{field : 'createUid',width : "10%",title : '添加人' },
+					{field : 'createTime',width : "10%",title : '创建时间' ,templet:function(d){return dateFormat(d.createTime, 'Y-m-d H:i:s')}},
+					{fixed: 'right',title:'操作栏',width : "10%", align:'center', toolbar: '#barDemo',style:'background-color: #66CCCC; color: #fff;'}
+					] 
+					         ],
+					page : true
+				});
+				  //监听工具条
+				  table.on('tool(idTest)', function(obj){
+				    var data = obj.data;
+				    if(obj.event === 'get'){
+				    	get(data);//明细
+				    }else if(obj.event=== 'edit'){
+				    	edit(data);//编辑
+				    }else if(obj.event==='del'){
+				    	del(data);//删除
+				    }
+				  });
+			});
+	    
+			 layui.use('laydate', function(){
+				  var laydate = layui.laydate;
+				  laydate.render({ 
+					  elem: '#createStart'
+					  ,type: 'datetime'
+					});
+				  laydate.render({ 
+					  elem: '#createEnd'
+					  ,type: 'datetime'
+					});
+				});
+	    
+			function get(obj){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "查看",
+				    	  content: _ctx+'/tKnowledge/knowledgeGet?id='+obj.id,
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+			
+			//添加
+		    function add() {
+		        layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "创建",
+				    	  content: _ctx+'/tKnowledge/knowledgeCreate?id= ',
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+		    }
+			
+		    function del(obj) {
+		        layer.confirm("你确定删除数据吗？", {icon: 3, title:'提示'},
+		            function(index){//确定回调
+		                $.ajax({
+		                	type:'post',
+		                	url:_ctx+'/tKnowledge/delete',
+		                	data:{'id':obj.id},
+		                	success:function(){
+		                		$(".layui-laypage-btn")[0].click();
+		                	}
+		                });
+		                layer.close(index);
+		            },function (index) {//取消回调
+		               layer.close(index);
+		            }
+		        );
+		    }
+			
+		  //编辑
+		    function edit(obj) {
+		        layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "创建",
+				    	  content: _ctx+'/tKnowledge/knowledgeCreate?id='+obj.id,
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+		    }
+			
+			function selectCategory(){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: false,
+				    	  content: _ctx+'/tKnowledgeCategory/categorySelect',
+				    	  area: ['600px', '600px'],
+				    	  maxmin: false,
+				    	  end:function(){
+				    		  //doing sth
+				    	  },
+				    	  cancel: function(index, layero){ 
+				    		  if(confirm('若关闭则清空已选分类,是否要关闭?')){ //只有当点击confirm框的确定时，该层才会关闭
+				    			setCategoryText("");
+				    			category=null;
+				    		    layer.close(index)
+				    		  }
+				    		  return false; 
+				    		} 
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+			
+			function searchGrid() {
+				var searchData={};
+				 	searchData.title=$('#title').val();
+				 	searchData.createStart=convertDateFromString($('#createStart').val()?$('#createStart').val():"1970-01-01 00:00:00");
+				 	searchData.createEnd=convertDateFromString($('#createEnd').val()?$('#createEnd').val():"2100-01-01 00:00:00");
+				 	if(category){
+				 		searchData.categoryId=category.id;
+				 	}else{
+				 		searchData.categoryId=' ';
+				 	}
+				table.reload('idTest', {
+					where : searchData,
+					page : {
+						curr : 1//重新从第 1 页开始
+					}
+				});
+			}
+			
+			function customFun(data){
+				category=data;
+				setCategoryText(data.categoryName);
+			}
+			function setCategoryText(text){
+				$("#category").val(text);
+			}
+			
+			function renderCategoryName(categoryId){
+				for(var i=0;i<categories.length;i++){
+					if(categories[i].id==categoryId){
+						var ids=categories[i].path.split("/");
+						var fullName="";
+						for(var j=0;j<ids.length;j++){
+							for(k=0;k<categories.length;k++){
+								if(ids[j]==categories[k].id){
+									fullName+=" ["+categories[k].categoryName+"] ";
+								}
+							}
+						}
+						return fullName;
+						//return categories[i].categoryName;
+					}
+				}
+				return "";
+			}
+			
+			
+		</script>
+</body>
+</html>

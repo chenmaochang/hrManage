@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>知识库</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+<style type="text/css">
+.newAppend{
+height: 100px;
+width: 100px;
+}
+</style>
+</head>
+<body>
+  <form class="layui-form"  id="myform">
+  <div class="layui-form-item">
+    <label class="layui-form-label">商品分类</label>
+    <div class="layui-input-block" style="width: 300px;">
+   <select class="layui-input" th:disabled="${view=='get'}" >
+	<option value="" >API服务</option>
+	</select>
+    <select id="belongCategory" name="belongCategory" class="layui-input" th:disabled="${view=='get'}">
+				<option value="" > 请选择  </option>
+				<option value="社保公积金" th:selected="${goods.belongCategory=='社保公积金'}" >社保公积金</option>
+				<option value="医疗健康" th:selected="${goods.belongCategory=='医疗健康'}">医疗健康</option>
+				<option value="人脸识别" th:selected="${goods.belongCategory=='人脸识别'}">人脸识别</option>
+				<option value="OCR识别" th:selected="${goods.belongCategory=='OCR识别'}">OCR识别</option>
+				<option value="金融征信" th:selected="${goods.belongCategory=='金融征信'}">金融征信</option>
+				<option value="公共交通" th:selected="${goods.belongCategory=='公共交通'}">公共交通</option>
+				<option value="居住信息" th:selected="${goods.belongCategory=='居住信息'}">居住信息</option>
+				<option value="礼品卡兑换" th:selected="${goods.belongCategory=='礼品卡兑换'}">礼品卡兑换</option>
+				<option value="生活服务" th:selected="${goods.belongCategory=='生活服务'}">生活服务</option>
+	</select>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">商品标题</label>
+    <div class="layui-input-block" style="width: 300px;" >
+    <input type="hidden" name="id" th:value="${goods.id}" class="layui-input">
+    <input type="text" name="goodsName" th:value="${goods.goodsName}" th:disabled="${view=='get'}" lay-verify="required" autocomplete="off" placeholder="建议在标题中包含产品名和产品特性关键词" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">商品描述</label>
+    <div class="layui-input-block" style="width: 600px;" >
+   <textarea name="goodsDesc"  lay-verify="required" th:disabled="${view=='get'}"   placeholder="请输入商品描述" class="layui-textarea" >[[${goods.goodsDesc}]]</textarea>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label" >上传主图</label>
+    <div class="layui-input-block" style="width: 300px;" >
+    <input type="hidden" name="mainPicture" th:value="${goods.mainPicture}" lay-verify="required"  class="layui-input">
+    <div class="layui-upload"><div th:if="${view!='get'}">
+  <button type="button" class="layui-btn" id="uploadMulti">图片上传</button>
+  <button type="button" class="layui-btn" id="clearLastOne">清除</button></div>
+  <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+    <div class="layui-upload-list" id="displayArea"></div>
+ </blockquote>
+</div>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label" >请求参数</label>
+    <div class="layui-input-block" style="width: 80%;" ><div th:if="${view!='get'}">
+    <button type="button" class="layui-btn" id="addRequestParam">添加一行</button>
+    <button type="button" class="layui-btn" id="removeRequestParam">删除一行</button></div>
+    <table class="layui-table" id="requestTable" lay-filter="requestTable"></table>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label" >返回参数</label>
+    <div class="layui-input-block" style="width: 80%;" >
+    <div th:if="${view!='get'}"><button type="button" class="layui-btn" id="addResponseParam">添加一行</button>
+    <button type="button" class="layui-btn" id="removeResponseParam">删除一行</button></div>
+    <table class="layui-table" id="responseTable" lay-filter="responseTable"></table>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label" >返回示例</label>
+    <div class="layui-input-block" style="width: 600px;" >
+    <textarea name="responseSample"  lay-verify="required" th:disabled="${view=='get'}"   placeholder="请输入返回示例" class="layui-textarea" >[[${goods.responseSample}]]</textarea>
+    </div>
+  </div>
+  <div class="layui-form-item" th:if="${view!='get'}">
+    <div class="layui-input-block" style="width: 300px;">
+      <button class="layui-btn" lay-submit="" lay-filter="submitForm" >保存</button>
+    </div>
+  </div>
+</form>
+		<script th:inline="javascript">
+		$(function(){
+			var pics=[[${goods.mainPicture}]].split(",");
+			for(var i=0;i<pics.length;i++){
+				if(!pics[i]){
+					break;
+				}
+				$('#displayArea').append('<img src="'+ pics[i] +'" alt="'+ pics[i] +'"  class="layui-upload-img newAppend">')	
+			}
+		});
+		
+		layui.use(['form', 'layedit', 'laydate','upload'], function(){
+				  var form = layui.form;
+				  var layer = layui.layer;
+				 var  upload = layui.upload;
+			  upload.render({
+				    elem: '#uploadMulti'
+				    ,url: _ctx+'/web/uploadFile'
+				    ,multiple: true
+				    ,before: function(obj){
+				      //预读本地文件示例，不支持ie8
+				      obj.preview(function(index, file, result){
+				        $('#displayArea').html('<img src="'+ result +'" alt="'+ file.name +'"  class="layui-upload-img newAppend">')
+				      });
+				    }
+				    ,done: function(res){//上传完毕
+				     /* if($("[name='mainPicture']").val()){
+				    	 $("[name='mainPicture']").val($("[name=mainPicture]").val()+","+res.data.src);
+				     }else{
+				    	 $("[name='mainPicture']").val(res.data.src);
+				     } */
+				    	$("[name='mainPicture']").val(res.data.src);
+				    }
+				  });
+			  
+			  form.on('submit(submitForm)', function(data){
+				  data.field.requestParam=JSON.stringify(layui.table.cache.requestTable);
+				  data.field.responseParam=JSON.stringify(layui.table.cache.responseTable);
+				  $.ajax({
+					  url:_ctx+'/goods/save',
+					  type:'post',
+					  data:data.field,
+					  success:function(result){
+						  $('#myform')[0].reset();
+						  layui.form.render();
+						  layer.msg("保存成功");
+						  var index = parent.layer.getFrameIndex(window.name);
+						  parent.layer.close(index);
+					  }
+				  });
+				  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+				});
+		});
+		
+		
+		//清除最后一张上传的图以及隐藏域中的部分值
+		$("#clearLastOne").click(function(){
+			$('.newAppend:last').remove();
+			var pictureValue=$("[name='mainPicture']").val();
+			if(pictureValue){
+				var subtringIndex=pictureValue.lastIndexOf(",");
+				$("[name='mainPicture']").val(pictureValue.substring(0,subtringIndex));
+			}
+		});
+		
+		
+		var requestParamData=[].concat(JSON.parse([[${goods.requestParam}]]));
+		var responseParamData=[].concat(JSON.parse([[${goods.responseParam}]]));
+		
+		var requestTable;
+		var responseTable;
+		var requestTableOpt={
+				elem : '#requestTable',
+				height : 'full',
+				where:{},
+				limit: 100,
+				data:requestParamData,
+				id : 'requestTable',
+				method : "post",
+				loading: true,
+				cols : [ 
+				         [
+				{field : 'pname',title : '名称' ,edit: 'text'},
+				{field : 'ptype',title : '类型' ,edit: 'text'},
+				{field : 'pmust',title : '是否必填' ,edit: 'text'},
+				{field : 'pdesc',title : '描述' ,edit: 'text'}
+				] 
+				         ],
+				page : false
+			};
+		var responseTableOpt={
+				elem : '#responseTable',
+				height : 'full',
+				where:{},
+				limit: 100,
+				data:responseParamData,
+				id : 'responseTable',
+				method : "post",
+				loading: true,
+				cols : [ 
+				         [
+				{field : 'pname',title : '名称' ,edit: 'text'},
+				{field : 'ptype',title : '类型' ,edit: 'text'},
+				{field : 'pdesc',title : '描述' ,edit: 'text'}
+				] 
+				         ],
+				page : false
+			};
+		
+		//渲染两个table
+		layui.use('table', function() {
+			requestTable = layui.table;
+			responseTable = layui.table;
+			requestTable.render(requestTableOpt);
+			responseTable.render(responseTableOpt);
+		});
+		
+		//添加一个入参到table
+		$("#addRequestParam").click(function(){
+			requestParamData.push({"pname":"","ptype":"","pmust":"","pdesc":""});
+			layui.use('table', function() {
+				requestTable = layui.table;
+				requestTable.render(requestTableOpt);
+			});
+		});
+		
+		//添加一个出参到table
+		$("#addResponseParam").click(function(){
+			responseParamData.push({"pname":"","ptype":"","pdesc":""});
+			layui.use('table', function() {
+				responseTable = layui.table;
+				responseTable.render(responseTableOpt);
+			});
+		});
+		
+		//删除一个入参到table
+		$("#removeRequestParam").click(function(){
+			requestParamData.pop();
+			layui.use('table', function() {
+				requestTable = layui.table;
+				requestTable.render(requestTableOpt);
+			});
+		});
+		
+		//删除一个入参到table
+		$("#removeResponseParam").click(function(){
+			responseParamData.pop();
+			layui.use('table', function() {
+				responseTable = layui.table;
+				responseTable.render(responseTableOpt);
+			});
+		});
+		
+	
+		</script>
+</body>
+</html>

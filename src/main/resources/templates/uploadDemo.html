@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>首页</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+	<form class="layui-form" id="submitForm">
+		<img class="layui-upload-img" id="coverImg"
+			style="width: 100px; height: 100px; " th:src="@{/images/upload.png}">
+		<input type="hidden" name="activityCover" autocomplete="off"
+			class="layui-input" lay-verify="required">
+	</form>
+	<script>
+	
+	layui.use(['form', 'layedit', 'laydate'], function(){
+		  var form = layui.form;
+		  layui.use('upload', function() {
+				var upload = layui.upload;
+				var uploadInst = upload.render({
+					elem : '#coverImg',
+					url : _ctx + '/web/uploadFile',
+					accept : 'file', //普通文件
+					exts : 'jpg|doc|docx|xls|xlsx|pdf',//只允许上传文档
+					before : function(obj) {
+						 /* obj.preview(function(index, file, result) {
+							$('#coverImg').attr('src', result); //图片链接（base64）
+						});  */
+					},
+					done : function(res) {
+						/* if (!res.success) {
+							alert("上传失败,请重新上传!");
+						} else {
+							$("[name='activityCover']").val(res.data.src);
+						} */
+					},
+					error : function(e) {
+						alert("上传出错,请重新上传!");
+					}
+				});
+			});
+	})
+		
+	</script>
+</body>
+</html>

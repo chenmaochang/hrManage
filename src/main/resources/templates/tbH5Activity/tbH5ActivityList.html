@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>知识库</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+	<div style="padding-bottom: 20px">
+		<ul class="layui-nav" lay-filter="" style="background-color: #3d3d3d">
+			<li class="layui-nav-item layui-this"><a href="">务务合作服务商管理系统</a></li>
+		</ul>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">渠道编号</label>
+		<div class="layui-input-inline">
+			<input id="canalCode" placeholder="请输入渠道编号" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">渠道名称</label>
+		<div class="layui-input-inline">
+			<input id="canalName" placeholder="请输入渠道名称" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">活动名称</label>
+		<div class="layui-input-inline">
+			<input id="activityName" placeholder="请输入活动名称" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">手机号码</label>
+		<div class="layui-input-inline">
+			<input id="telephone" placeholder="请输入手机号码" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">数据状态</label>
+		<div class="layui-input-inline">
+			<select id="dataStatus" class="layui-input">
+				<option value=""> 请选择  </option>
+				<option value="0">有效</option>
+				<option value="1" >无效</option>
+				<option value="2" >未处理</option>
+			</select>
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<label class="layui-form-label">创建时间</label>
+		<div class="layui-input-inline">
+			<input id="createTime"  class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<div class="layui-input-inline">
+		<a class="layui-btn layui-btn-normal" onclick="searchGrid()"> 搜索 </a>
+		<a class="layui-btn layui-btn-normal" onclick="create()"> 新增 </a>
+		</div>
+	</div>
+	<div style="height: 80%">
+	<table class="layui-hide" id="idTest" lay-filter="idTest"></table>
+	</div>
+	<script type="text/html" id="barDemo">
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="get">查看</a>
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="edit">编辑</a>
+	</script>
+		<script th:inline="javascript">
+		var category=null;
+		var categories=[[${tKnowledgeCategories}]];
+		
+		layui.use('element', function(){
+			  var element = layui.element;
+			});
+			var table;
+			layui.use(['table','form'], function() {
+				table = layui.table;
+				table.render({
+					elem : '#idTest',
+					height : 'full',
+					where:{},
+					url : _ctx+'/tbH5Activity/listData',
+					id : 'idTest',
+					method : "post",
+					loading: true,
+					limits:[5,10],
+					cols : [ 
+					         [
+					{field : 'id',width : "10%",title : 'ID' },
+					{field : 'canalCode',width : "10%",title : '渠道编号' },
+					{field : 'canalName',width : "15%",title : '渠道名称' },
+					{field : 'activityName',width : "20%",title : '活动名称 '},
+					{field : 'telephone',width : "10%",title : '手机号' },
+					{field : 'prize',width : "10%",title : '奖品' },
+					{field : 'dataStatus',width : "10%",title : '数据状态 ' ,templet:function(d){if(d.dataStatus==0){return "有效";}else if(d.dataStatus==1){return "无效";}else{return "未处理";}}},
+					{field : 'createTime',width : "15%",title : '创建时间' ,templet:function(d){return dateFormat(d.createTime, 'Y-m-d H:i:s')}},
+					{fixed: 'right',title:'操作栏',width : "10%", align:'center', toolbar: '#barDemo',style:'background-color: #66CCCC; color: #fff;'}
+					] 
+					         ],
+					page : true
+				});
+				  //监听工具条
+				  table.on('tool(idTest)', function(obj){
+				    var data = obj.data;
+				    if(obj.event === 'get'){
+				    	get(data);//明细
+				    }else if(obj.event=== 'edit'){
+				    	edit(data);//编辑
+				    }
+				  });
+			});
+	    
+			 layui.use('laydate', function(){
+				  var laydate = layui.laydate;
+				  laydate.render({ 
+					  elem: '#createTime'
+					  ,range: true
+					});
+				});
+	    
+			function get(obj){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "查看",
+				    	  content: _ctx+'/tbH5Activity/tbH5ActivityGet?edit=get&id='+obj.id,
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+
+		  //编辑
+		    function edit(obj) {
+		        layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,	
+				    	  title: "编辑",
+				    	  content: _ctx+'/tbH5Activity/tbH5ActivityGet?edit=edit&id='+obj.id,
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+		    }
+			
+			
+			function searchGrid() {
+				var searchData={};
+				 	searchData.canalCode=$('#canalCode').val();
+				 	searchData.canalName=$('#canalName').val();
+				 	searchData.activityName=$('#activityName').val();
+				 	searchData.telephone=$('#telephone').val();
+				 	searchData.dataStatus=$('#dataStatus').val();
+				 	searchData.createTime=$('#createTime').val();
+				table.reload('idTest', {
+					where : searchData,
+					page : {
+						curr : 1//重新从第 1 页开始
+					}
+				});
+			}
+			
+			function create(){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,	
+				    	  title: "新增",
+				    	  content: _ctx+'/tbH5Activity/tbH5ActivityCreate',
+				    	  area: ['800px', '800px'],
+				    	  maxmin: true,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+			
+			
+			
+			
+		</script>
+</body>
+</html>
