@@ -65,11 +65,11 @@
 	</div>
 	<script type="text/html" id="barDemo">
 <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="get">查看</a>
-<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="edit">编辑</a>
-<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="del">删除</a>
 {{#  if(d.pendStatus==1){ }}
 <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="pendOff">下架</a>
   {{#  } else { }}
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="edit">编辑</a>
+<a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="del">删除</a>
 <a class="layui-btn layui-btn-xs layui-btn-radius layui-btn-primary" lay-event="pendOn">上架</a>
   {{#  } }}
 	</script>
@@ -94,7 +94,7 @@
 					{type:'checkbox'} ,
 					{field : 'goodsName',width : "20%",title : '标题' },
 					{field : 'belongCategory',width : "10%",title : '类目' },
-					{field : 'goodsPrice',width : "10%",title : '价格',templet:function(d){return "资讯客服";} },
+					{field : 'goodsPrice',width : "10%",title : '价格',templet:function(d){if(d.goodsPrice<0){return "咨询客服";}else if(d.goodsPrice==0){return "免费商品"}else{return d.goodsPrice;}} },
 					{field : 'pendStatus',width : "10%",title : '状态',templet:function(d){if(d.pendStatus==0){return "待上架";}else{return "出售中";}} },
 					{field : 'updateTime',width : "20%",title : '最后编辑时间' ,templet:function(d){return dateFormat(d.createTime, 'Y-m-d H:i:s')}},
 					{fixed: 'right',title:'操作栏',width : "300px;", align:'center', toolbar: '#barDemo',style:'background-color: #C4C4C4; color: #fff;'}
