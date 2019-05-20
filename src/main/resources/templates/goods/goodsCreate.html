@@ -140,6 +140,7 @@ width: 100px;
 					  data:data.field,
 					  success:function(result){
 						  $('#myform')[0].reset();
+						  $('#clearLastOne').click();
 						  layui.form.render();
 						  layer.msg("保存成功");
 						  var index = parent.layer.getFrameIndex(window.name);
