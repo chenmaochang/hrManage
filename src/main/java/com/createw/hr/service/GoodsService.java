@@ -11,7 +11,7 @@ import com.createw.hr.bean.GoodsExample;
 @Service(value="goodsService")
 public interface GoodsService {
 	long countByExample(GoodsExample example);
-	List<Goods> selectByExample(GoodsExample example);
+	List<Goods> selectByExampleWithBLOBs(GoodsExample example);
 	Integer insert(Goods goods);
 	int insertSelective(Goods record);
 	int updateByExampleSelective(@Param("record") Goods record, @Param("example") GoodsExample example);

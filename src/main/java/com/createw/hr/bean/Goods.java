@@ -9,15 +9,13 @@ public class Goods {
 
     private String goodsDesc;
 
-    private Integer goodsPrice;
+    private Float goodsPrice;
 
     private String mainPicture;
 
     private String requestParam;
 
     private String responseParam;
-
-    private String responseSample;
 
     private String pendStatus;
 
@@ -32,6 +30,8 @@ public class Goods {
     private String sysStatus;
 
     private String belongCategory;
+
+    private String responseSample;
 
     public String getId() {
         return id;
@@ -57,11 +57,11 @@ public class Goods {
         this.goodsDesc = goodsDesc == null ? null : goodsDesc.trim();
     }
 
-    public Integer getGoodsPrice() {
+    public Float getGoodsPrice() {
         return goodsPrice;
     }
 
-    public void setGoodsPrice(Integer goodsPrice) {
+    public void setGoodsPrice(Float goodsPrice) {
         this.goodsPrice = goodsPrice;
     }
 
@@ -87,14 +87,6 @@ public class Goods {
 
     public void setResponseParam(String responseParam) {
         this.responseParam = responseParam == null ? null : responseParam.trim();
-    }
-
-    public String getResponseSample() {
-        return responseSample;
-    }
-
-    public void setResponseSample(String responseSample) {
-        this.responseSample = responseSample == null ? null : responseSample.trim();
     }
 
     public String getPendStatus() {
@@ -151,5 +143,13 @@ public class Goods {
 
     public void setBelongCategory(String belongCategory) {
         this.belongCategory = belongCategory == null ? null : belongCategory.trim();
+    }
+
+    public String getResponseSample() {
+        return responseSample;
+    }
+
+    public void setResponseSample(String responseSample) {
+        this.responseSample = responseSample == null ? null : responseSample.trim();
     }
 }

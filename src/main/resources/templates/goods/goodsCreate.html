@@ -87,7 +87,7 @@ width: 100px;
   <div class="layui-form-item">
     <label class="layui-form-label" >返回示例</label>
     <div class="layui-input-block" style="width: 600px;" >
-    <textarea name="responseSample"  lay-verify="required" th:disabled="${view=='get'}"   placeholder="请输入返回示例" class="layui-textarea" >[[${goods.responseSample}]]</textarea>
+    <textarea id="responseSample" name="responseSample" lay-verify="required" th:disabled="${view=='get'}" style="display: none;width: 100%;height: 100px;">[[${goods.responseSample}]]</textarea>
     </div>
   </div>
   <div class="layui-form-item" th:if="${view!='get'}">
@@ -110,7 +110,10 @@ width: 100px;
 		layui.use(['form', 'layedit', 'laydate','upload'], function(){
 				  var form = layui.form;
 				  var layer = layui.layer;
+				  var layedit = layui.layedit;
 				 var  upload = layui.upload;
+				 var index=[[${view!='get'}]]?layedit.build('responseSample'):$("#responseSample").show(); //建立编辑器
+				 
 			  upload.render({
 				    elem: '#uploadMulti'
 				    ,url: _ctx+'/web/uploadFile'
@@ -134,6 +137,7 @@ width: 100px;
 			  form.on('submit(submitForm)', function(data){
 				  data.field.requestParam=JSON.stringify(layui.table.cache.requestTable);
 				  data.field.responseParam=JSON.stringify(layui.table.cache.responseTable);
+				  data.field.responseSample=layedit.getContent(index);
 				  $.ajax({
 					  url:_ctx+'/goods/save',
 					  type:'post',

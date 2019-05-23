@@ -10,8 +10,9 @@ public class GoodsExample {
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
-
+    
     protected String limit;
+
     public GoodsExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
@@ -65,7 +66,15 @@ public class GoodsExample {
         distinct = false;
     }
 
-    protected abstract static class GeneratedCriteria {
+    public String getLimit() {
+		return limit;
+	}
+
+	public void setLimit(String limit) {
+		this.limit = limit;
+	}
+
+	protected abstract static class GeneratedCriteria {
         protected List<Criterion> criteria;
 
         protected GeneratedCriteria() {
@@ -326,52 +335,52 @@ public class GoodsExample {
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceEqualTo(Integer value) {
+        public Criteria andGoodsPriceEqualTo(Float value) {
             addCriterion("goods_price =", value, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceNotEqualTo(Integer value) {
+        public Criteria andGoodsPriceNotEqualTo(Float value) {
             addCriterion("goods_price <>", value, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceGreaterThan(Integer value) {
+        public Criteria andGoodsPriceGreaterThan(Float value) {
             addCriterion("goods_price >", value, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceGreaterThanOrEqualTo(Integer value) {
+        public Criteria andGoodsPriceGreaterThanOrEqualTo(Float value) {
             addCriterion("goods_price >=", value, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceLessThan(Integer value) {
+        public Criteria andGoodsPriceLessThan(Float value) {
             addCriterion("goods_price <", value, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceLessThanOrEqualTo(Integer value) {
+        public Criteria andGoodsPriceLessThanOrEqualTo(Float value) {
             addCriterion("goods_price <=", value, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceIn(List<Integer> values) {
+        public Criteria andGoodsPriceIn(List<Float> values) {
             addCriterion("goods_price in", values, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceNotIn(List<Integer> values) {
+        public Criteria andGoodsPriceNotIn(List<Float> values) {
             addCriterion("goods_price not in", values, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceBetween(Integer value1, Integer value2) {
+        public Criteria andGoodsPriceBetween(Float value1, Float value2) {
             addCriterion("goods_price between", value1, value2, "goodsPrice");
             return (Criteria) this;
         }
 
-        public Criteria andGoodsPriceNotBetween(Integer value1, Integer value2) {
+        public Criteria andGoodsPriceNotBetween(Float value1, Float value2) {
             addCriterion("goods_price not between", value1, value2, "goodsPrice");
             return (Criteria) this;
         }
@@ -583,76 +592,6 @@ public class GoodsExample {
 
         public Criteria andResponseParamNotBetween(String value1, String value2) {
             addCriterion("response_param not between", value1, value2, "responseParam");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleIsNull() {
-            addCriterion("response_sample is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleIsNotNull() {
-            addCriterion("response_sample is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleEqualTo(String value) {
-            addCriterion("response_sample =", value, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleNotEqualTo(String value) {
-            addCriterion("response_sample <>", value, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleGreaterThan(String value) {
-            addCriterion("response_sample >", value, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleGreaterThanOrEqualTo(String value) {
-            addCriterion("response_sample >=", value, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleLessThan(String value) {
-            addCriterion("response_sample <", value, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleLessThanOrEqualTo(String value) {
-            addCriterion("response_sample <=", value, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleLike(String value) {
-            addCriterion("response_sample like", value, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleNotLike(String value) {
-            addCriterion("response_sample not like", value, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleIn(List<String> values) {
-            addCriterion("response_sample in", values, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleNotIn(List<String> values) {
-            addCriterion("response_sample not in", values, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleBetween(String value1, String value2) {
-            addCriterion("response_sample between", value1, value2, "responseSample");
-            return (Criteria) this;
-        }
-
-        public Criteria andResponseSampleNotBetween(String value1, String value2) {
-            addCriterion("response_sample not between", value1, value2, "responseSample");
             return (Criteria) this;
         }
 
@@ -1127,15 +1066,7 @@ public class GoodsExample {
         }
     }
 
-    public String getLimit() {
-		return limit;
-	}
-
-	public void setLimit(String limit) {
-		this.limit = limit;
-	}
-
-	public static class Criteria extends GeneratedCriteria {
+    public static class Criteria extends GeneratedCriteria {
 
         protected Criteria() {
             super();

@@ -79,7 +79,7 @@ public class GoodsController {
     	jsonObject.put("count", goodsService.countByExample(goodsExample));
     	
     	goodsExample.setLimit("limit "+(page-1)*limit+","+limit);
-    	List<Goods> goodses=goodsService.selectByExample(goodsExample);
+    	List<Goods> goodses=goodsService.selectByExampleWithBLOBs(goodsExample);
     	jsonObject.put("data", goodses);
     	jsonObject.put("code", 0);
     	return jsonObject;
@@ -130,7 +130,7 @@ public class GoodsController {
 			GoodsExample example=new GoodsExample();
 			Criteria criteria=example.createCriteria();
 			criteria.andIdEqualTo(id);
-			List<Goods> list=goodsService.selectByExample(example);
+			List<Goods> list=goodsService.selectByExampleWithBLOBs(example);
 			if(list.size()>0) {
 				goods=list.get(0);
 			}
@@ -184,7 +184,7 @@ public class GoodsController {
 		GoodsExample example=new GoodsExample();
 		Criteria criteria=example.createCriteria();
 		criteria.andIdEqualTo(id);
-		List<Goods> list=goodsService.selectByExample(example);
+		List<Goods> list=goodsService.selectByExampleWithBLOBs(example);
 		ModelAndView modelAndView = new ModelAndView(VIEW + "/goodsCreate");
 		modelAndView.addObject("goods", list.get(0));
 		modelAndView.addObject("view", "get");

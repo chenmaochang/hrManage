@@ -10,12 +10,6 @@
 <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
 </head>
 <body style="margin-top: 10px;">
-	<!-- <div style="padding-bottom: 20px">
-		<ul class="layui-nav" lay-filter="" style="background-color: #3d3d3d">
-			<li class="layui-nav-item"><a href="">首页</a></li>
-			<li class="layui-nav-item layui-this"><a href="">列表</a></li>
-		</ul>
-	</div> -->
 	<div style="display: inline-block; ">
 		<label class="layui-form-label">商品名称</label>
 		<div class="layui-input-inline" style="width: 150px;">
@@ -83,12 +77,11 @@
 				table.render({
 					elem : '#idTest',
 					height : 'full',
-					where:{},
 					url : _ctx+'/goods/listData',
 					id : 'idTest',
 					method : "post",
 					loading: true,
-					limits:[5,10],
+					limits:[10],
 					cols : [ 
 					         [
 					{type:'checkbox'} ,

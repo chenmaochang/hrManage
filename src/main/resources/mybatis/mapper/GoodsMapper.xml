@@ -5,11 +5,10 @@
     <result column="id" jdbcType="VARCHAR" property="id" />
     <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
     <result column="goods_desc" jdbcType="VARCHAR" property="goodsDesc" />
-    <result column="goods_price" jdbcType="INTEGER" property="goodsPrice" />
+    <result column="goods_price" jdbcType="REAL" property="goodsPrice" />
     <result column="main_picture" jdbcType="VARCHAR" property="mainPicture" />
     <result column="request_param" jdbcType="VARCHAR" property="requestParam" />
     <result column="response_param" jdbcType="VARCHAR" property="responseParam" />
-    <result column="response_sample" jdbcType="VARCHAR" property="responseSample" />
     <result column="pend_status" jdbcType="VARCHAR" property="pendStatus" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -17,6 +16,9 @@
     <result column="update_id" jdbcType="VARCHAR" property="updateId" />
     <result column="sys_status" jdbcType="VARCHAR" property="sysStatus" />
     <result column="belong_category" jdbcType="VARCHAR" property="belongCategory" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.createw.hr.bean.Goods">
+    <result column="response_sample" jdbcType="LONGVARCHAR" property="responseSample" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -78,9 +80,30 @@
   </sql>
   <sql id="Base_Column_List">
     id, goods_name, goods_desc, goods_price, main_picture, request_param, response_param, 
-    response_sample, pend_status, create_time, update_time, create_id, update_id, sys_status, 
-    belong_category
+    pend_status, create_time, update_time, create_id, update_id, sys_status, belong_category
   </sql>
+  <sql id="Blob_Column_List">
+    response_sample
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.createw.hr.bean.GoodsExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from goods
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null">
+     ${limit}
+    </if>
+  </select>
   <select id="selectByExample" parameterType="com.createw.hr.bean.GoodsExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -107,15 +130,15 @@
   <insert id="insert" parameterType="com.createw.hr.bean.Goods">
     insert into goods (id, goods_name, goods_desc, 
       goods_price, main_picture, request_param, 
-      response_param, response_sample, pend_status, 
-      create_time, update_time, create_id, 
-      update_id, sys_status, belong_category
+      response_param, pend_status, create_time, 
+      update_time, create_id, update_id, 
+      sys_status, belong_category, response_sample
       )
     values (#{id,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, #{goodsDesc,jdbcType=VARCHAR}, 
-      #{goodsPrice,jdbcType=INTEGER}, #{mainPicture,jdbcType=VARCHAR}, #{requestParam,jdbcType=VARCHAR}, 
-      #{responseParam,jdbcType=VARCHAR}, #{responseSample,jdbcType=VARCHAR}, #{pendStatus,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, 
-      #{updateId,jdbcType=VARCHAR}, #{sysStatus,jdbcType=VARCHAR}, #{belongCategory,jdbcType=VARCHAR}
+      #{goodsPrice,jdbcType=REAL}, #{mainPicture,jdbcType=VARCHAR}, #{requestParam,jdbcType=VARCHAR}, 
+      #{responseParam,jdbcType=VARCHAR}, #{pendStatus,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{updateId,jdbcType=VARCHAR}, 
+      #{sysStatus,jdbcType=VARCHAR}, #{belongCategory,jdbcType=VARCHAR}, #{responseSample,jdbcType=LONGVARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.createw.hr.bean.Goods">
@@ -142,9 +165,6 @@
       <if test="responseParam != null">
         response_param,
       </if>
-      <if test="responseSample != null">
-        response_sample,
-      </if>
       <if test="pendStatus != null">
         pend_status,
       </if>
@@ -166,6 +186,9 @@
       <if test="belongCategory != null">
         belong_category,
       </if>
+      <if test="responseSample != null">
+        response_sample,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -178,7 +201,7 @@
         #{goodsDesc,jdbcType=VARCHAR},
       </if>
       <if test="goodsPrice != null">
-        #{goodsPrice,jdbcType=INTEGER},
+        #{goodsPrice,jdbcType=REAL},
       </if>
       <if test="mainPicture != null">
         #{mainPicture,jdbcType=VARCHAR},
@@ -188,9 +211,6 @@
       </if>
       <if test="responseParam != null">
         #{responseParam,jdbcType=VARCHAR},
-      </if>
-      <if test="responseSample != null">
-        #{responseSample,jdbcType=VARCHAR},
       </if>
       <if test="pendStatus != null">
         #{pendStatus,jdbcType=VARCHAR},
@@ -213,6 +233,9 @@
       <if test="belongCategory != null">
         #{belongCategory,jdbcType=VARCHAR},
       </if>
+      <if test="responseSample != null">
+        #{responseSample,jdbcType=LONGVARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.createw.hr.bean.GoodsExample" resultType="java.lang.Long">
@@ -234,7 +257,7 @@
         goods_desc = #{record.goodsDesc,jdbcType=VARCHAR},
       </if>
       <if test="record.goodsPrice != null">
-        goods_price = #{record.goodsPrice,jdbcType=INTEGER},
+        goods_price = #{record.goodsPrice,jdbcType=REAL},
       </if>
       <if test="record.mainPicture != null">
         main_picture = #{record.mainPicture,jdbcType=VARCHAR},
@@ -244,9 +267,6 @@
       </if>
       <if test="record.responseParam != null">
         response_param = #{record.responseParam,jdbcType=VARCHAR},
-      </if>
-      <if test="record.responseSample != null">
-        response_sample = #{record.responseSample,jdbcType=VARCHAR},
       </if>
       <if test="record.pendStatus != null">
         pend_status = #{record.pendStatus,jdbcType=VARCHAR},
@@ -269,7 +289,31 @@
       <if test="record.belongCategory != null">
         belong_category = #{record.belongCategory,jdbcType=VARCHAR},
       </if>
+      <if test="record.responseSample != null">
+        response_sample = #{record.responseSample,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update goods
+    set id = #{record.id,jdbcType=VARCHAR},
+      goods_name = #{record.goodsName,jdbcType=VARCHAR},
+      goods_desc = #{record.goodsDesc,jdbcType=VARCHAR},
+      goods_price = #{record.goodsPrice,jdbcType=REAL},
+      main_picture = #{record.mainPicture,jdbcType=VARCHAR},
+      request_param = #{record.requestParam,jdbcType=VARCHAR},
+      response_param = #{record.responseParam,jdbcType=VARCHAR},
+      pend_status = #{record.pendStatus,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      create_id = #{record.createId,jdbcType=VARCHAR},
+      update_id = #{record.updateId,jdbcType=VARCHAR},
+      sys_status = #{record.sysStatus,jdbcType=VARCHAR},
+      belong_category = #{record.belongCategory,jdbcType=VARCHAR},
+      response_sample = #{record.responseSample,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -279,11 +323,10 @@
     set id = #{record.id,jdbcType=VARCHAR},
       goods_name = #{record.goodsName,jdbcType=VARCHAR},
       goods_desc = #{record.goodsDesc,jdbcType=VARCHAR},
-      goods_price = #{record.goodsPrice,jdbcType=INTEGER},
+      goods_price = #{record.goodsPrice,jdbcType=REAL},
       main_picture = #{record.mainPicture,jdbcType=VARCHAR},
       request_param = #{record.requestParam,jdbcType=VARCHAR},
       response_param = #{record.responseParam,jdbcType=VARCHAR},
-      response_sample = #{record.responseSample,jdbcType=VARCHAR},
       pend_status = #{record.pendStatus,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},

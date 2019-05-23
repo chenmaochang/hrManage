@@ -20,8 +20,8 @@ public class GoodsServiceImpl implements GoodsService{
 		return goodsMapper.countByExample(example);
 	}
 	@Override
-	public List<Goods> selectByExample(GoodsExample example) {
-		return goodsMapper.selectByExample(example);
+	public List<Goods> selectByExampleWithBLOBs(GoodsExample example) {
+		return goodsMapper.selectByExampleWithBLOBs(example);
 	}
 	@Override
 	public Integer insert(Goods goods) {

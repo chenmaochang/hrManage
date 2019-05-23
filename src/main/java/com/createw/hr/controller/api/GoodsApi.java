@@ -72,7 +72,7 @@ public class GoodsApi {
     		criteria.andBelongCategoryEqualTo(goods.getBelongCategory());
     	}
     	if(goods.getGoodsPrice()!=null&&goods.getGoodsPrice()==0) {
-    		criteria.andGoodsPriceEqualTo(0);
+    		criteria.andGoodsPriceEqualTo((float) 0);
     	}
     	goodsExample.setOrderByClause("create_time desc");
     	criteria.andSysStatusEqualTo("1");
@@ -80,7 +80,7 @@ public class GoodsApi {
     	jsonObject.put("count", goodsService.countByExample(goodsExample));
     	
     	goodsExample.setLimit("limit "+(page-1)*limit+","+limit);
-    	List<Goods> goodses=goodsService.selectByExample(goodsExample);
+    	List<Goods> goodses=goodsService.selectByExampleWithBLOBs(goodsExample);
     	jsonObject.put("data", goodses);
     	jsonObject.put("code", 0);
     	return jsonObject;
@@ -120,7 +120,7 @@ public class GoodsApi {
     	GoodsExample goodsExample=new GoodsExample();
     	GoodsExample.Criteria criteria=goodsExample.createCriteria();
     	criteria.andIdEqualTo(id);
-    	List<Goods> goods=goodsService.selectByExample(goodsExample);
+    	List<Goods> goods=goodsService.selectByExampleWithBLOBs(goodsExample);
     	if(goods.size()<=0) {
     		rtnObj.put("success", false);
     		return rtnObj;
